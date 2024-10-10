@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <button onclick="generatePDF()">Complete Payment</button>
+
+    <script>
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add header
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Restaurant Name", 14, 20);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("Address: 123 Restaurant St, City, State, ZIP", 14, 30);
+            doc.text("Phone: +1234567890", 14, 40);
+
+            // Add Bill Title
+            doc.setFontSize(18);
+            doc.setFont("helvetica", "bold");
+            doc.text("Bill", 14, 60);
+
+            // Add Date and Time
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 70);
+            doc.text(`Time: ${new Date().toLocaleTimeString()}`, 14, 80);
+
+            // Add Food Items
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text('Food Items:', 14, 100);
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            const foodItems = JSON.parse(localStorage.getItem('cart')) || [];
+            let yOffset = 110;
+            foodItems.forEach(item => {
+                doc.text(`${item.name} - ₹${item.price} x ${item.quantity}`, 14, yOffset);
+                yOffset += 10;
+            });
+
+            // Add Delivery Details
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text('Delivery Details:', 14, yOffset + 10);
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            const name = localStorage.getItem('deliveryName') || 'N/A';
+            const phone = localStorage.getItem('deliveryPhone') || 'N/A';
+            const address = localStorage.getItem('deliveryAddress') || 'N/A';
+            const district = localStorage.getItem('deliveryDistrict') || 'N/A';
+            const state = localStorage.getItem('deliveryState') || 'N/A';
+            const pincode = localStorage.getItem('deliveryPincode') || 'N/A';
+            doc.text(`Name: ${name}`, 14, yOffset + 20);
+            doc.text(`Phone: ${phone}`, 14, yOffset + 30);
+            doc.text(`Address: ${address}`, 14, yOffset + 40);
+            doc.text(`District: ${district}`, 14, yOffset + 50);
+            doc.text(`State: ${state}`, 14, yOffset + 60);
+            doc.text(`Pincode: ${pincode}`, 14, yOffset + 70);
+
+            // Add Payment Method
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text('Payment Method:', 14, yOffset + 90);
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            const paymentMethod = localStorage.getItem('paymentMethod') || 'N/A';
+            doc.text(paymentMethod, 14, yOffset + 100);
+
+            // Add Footer
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
+            doc.text('Thank you for dining with us!', 14, yOffset + 120);
+            doc.text('For any queries, please contact us at support@restaurant.com', 14, yOffset + 130);
+
+            // Save the PDF
+            doc.save('bill.pdf');
+        }
+    </script>
+</body>
+</html>
